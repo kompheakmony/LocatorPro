@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import MapView from './components/MapView';
 import { Category, UserLocation, Location } from './types';
 import { motion, AnimatePresence } from 'motion/react';
-import { Target, Search } from 'lucide-react';
+import { Target, Search, X } from 'lucide-react';
 import { LocationService } from './services/locationService';
 
 export default function App() {
@@ -11,22 +11,28 @@ export default function App() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
-  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([11.5564, 104.9282]); // Default to Phnom Penh
   const [mapZoom, setMapZoom] = useState(13);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch dynamic data
-    // Use an environment variable or hardcoded MID if you have one
     const MY_MAP_ID = import.meta.env.VITE_MY_MAP_ID; 
     
-    LocationService.fetchLocations(MY_MAP_ID).then(data => {
-      setLocations(data);
-      if (data.length > 0) {
-        setMapCenter([data[0].lat, data[0].lng]);
-      }
-      setIsLoading(false);
-    });
+    LocationService.fetchLocations(MY_MAP_ID)
+      .then(data => {
+        setLocations(data);
+        if (data.length > 0) {
+          setMapCenter([data[0].lat, data[0].lng]);
+        }
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        setError('Failed to load map data. Please check your Map ID or connectivity.');
+        setIsLoading(false);
+      });
 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -97,6 +103,22 @@ export default function App() {
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-800">LocatorPro</h1>
         </div>
+        
+        {error && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[3000] w-full max-w-sm px-4">
+            <div className="bg-red-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center gap-3">
+                <div className="bg-black/10 p-1.5 rounded-lg">
+                  <Target size={14} className="text-white" />
+                </div>
+                <p className="text-[11px] font-bold tracking-tight">{error}</p>
+              </div>
+              <button onClick={() => setError(null)} className="h-6 w-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        )}
         
         <div className="flex-1 max-w-xl px-12">
           <div className="relative group">

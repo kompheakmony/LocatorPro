@@ -1,33 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { Building2, Clock, Landmark, MapPin, Navigation, X } from 'lucide-react';
+import { MapPin, Navigation, X } from 'lucide-react';
 import { Location, Category } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
-const CATEGORY_ICONS: Record<Category, React.ReactNode> = {
-  'Branch': <Landmark size={20} />,
-  '24/7': <Clock size={20} />,
-  'ATM': <Building2 size={20} />
+
+const ICON_URLS: Record<Category, string> = {
+  'Branch': '/Branch.png',
+  '24/7': '/24-7.png',
+  'ATM': '/ATM.png'
 };
 
 const createCustomIcon = (category: Category, isActive: boolean) => {
-  const categoryClass = category === 'Branch' ? 'marker-branch' : 
-                       category === '24/7' ? 'marker-247' : 'marker-atm';
-  
-  const html = renderToStaticMarkup(
-    <div className={`custom-marker ${categoryClass} ${isActive ? 'active' : ''} h-9 w-9`}>
-      <div className="scale-75">
-        {CATEGORY_ICONS[category]}
-      </div>
-    </div>
-  );
-  return L.divIcon({
-    html,
-    className: 'custom-div-icon',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+  return L.icon({
+    iconUrl: ICON_URLS[category],
+    iconSize: isActive ? [32, 38] : [32, 38],
+    iconAnchor: isActive ? [20, 20] : [16, 16],
+    popupAnchor: [0, -16],
+    className: `custom-marker ${isActive ? 'active' : ''}`
   });
 };
 
@@ -118,6 +109,12 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
             src={loc.photo} 
             alt={loc.name}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400') {
+                target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400';
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <button 
