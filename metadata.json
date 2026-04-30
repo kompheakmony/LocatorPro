@@ -1,0 +1,6 @@
+{
+  "name": "Locate360 - Business Hub",
+  "description": "Dynamic location map for branches, 24/7 centers, and ATMs with real-time distance sorting and smart filters.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": []
+}
