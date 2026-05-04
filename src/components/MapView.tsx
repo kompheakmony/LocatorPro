@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Navigation, X, Phone } from 'lucide-react';
+import { BRAND_CONFIG } from '../constants';
 import { Location, Category } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -167,7 +168,7 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-[340px] bg-white rounded-[32px] shadow-[0_30px_90px_-20px_rgba(0,59,92,0.25)] overflow-hidden border border-white/50 flex flex-col"
+        className="w-[340px] bg-white rounded-[32px] shadow-[0_30px_90px_-20px_rgba(var(--color-brand-primary-rgb),0.25)] overflow-hidden border border-white/50 flex flex-col"
       >
         {/* Header Image Area */}
         <div className="relative h-40 group">
@@ -180,7 +181,7 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
               target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#003B5C]/90 via-[#003B5C]/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-brand-primary/30 to-transparent" />
           
           <button 
             onClick={handleClose}
@@ -192,11 +193,11 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
           <div className="absolute bottom-4 left-6 right-6">
             <div className="flex items-center gap-2 mb-2">
               <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full ${
-                loc.category === 'Branch' ? 'bg-[#003B5C] text-white' :
-                loc.category === '24/7' ? 'bg-[#00ADC6] text-white shadow-lg shadow-[#00ADC6]/30' : 
+                loc.category === 'Branch' ? 'bg-brand-primary text-white' :
+                loc.category === '24/7' ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/30' : 
                 'bg-slate-900 text-white'
               }`}>
-                {loc.category}
+                {BRAND_CONFIG.categories[loc.category as keyof typeof BRAND_CONFIG.categories]?.label || loc.category}
               </span>
             </div>
             <h3 className="text-lg font-black text-white leading-tight tracking-tight">{loc.name}</h3>
@@ -207,24 +208,24 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
         <div className="p-6 space-y-5 bg-white">
           <div className="space-y-4">
             <div className="flex items-center gap-4 group">
-              <div className="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-[#00ADC6]/10 transition-colors">
-                <MapPin size={16} className="text-[#00ADC6]" />
+              <div className="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-brand-secondary/10 transition-colors">
+                <MapPin size={16} className="text-brand-secondary" />
               </div>
-              <p className="flex-1 text-[11px] text-[#003B5C]/80 leading-relaxed font-bold">{loc.address}</p>
+              <p className="flex-1 text-[11px] text-brand-primary/80 leading-relaxed font-bold">{loc.address}</p>
             </div>
 
             <div className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
               <div className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                <Phone size={18} className="text-[#00ADC6]" />
+                <Phone size={18} className="text-brand-secondary" />
               </div>
               <div className="flex-1 grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Call Center</div>
-                  <div className="text-[11px] font-black text-[#003B5C]">1800 203 203</div>
+                  <div className="text-[11px] font-black text-brand-primary">1800 203 203</div>
                 </div>
                 <div>
                   <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Mobile</div>
-                  <div className="text-[11px] font-black text-[#003B5C]">098 203 333</div>
+                  <div className="text-[11px] font-black text-brand-primary">098 203 333</div>
                 </div>
               </div>
             </div>
@@ -234,7 +235,7 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
           <div className="pt-2 flex gap-3">
             <button 
               onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank')}
-              className="flex-1 h-12 bg-[#00ADC6] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0096AD] shadow-[0_8px_20px_-8px_rgba(0,173,198,0.5)] transition-all flex items-center justify-center gap-2 group active:scale-95"
+              className="flex-1 h-12 bg-brand-secondary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-secondary-dark shadow-[0_8px_20px_-8px_rgba(var(--color-brand-secondary-rgb),0.5)] transition-all flex items-center justify-center gap-2 group active:scale-95"
             >
               <Navigation size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               Direction

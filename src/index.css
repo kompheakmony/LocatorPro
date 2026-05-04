@@ -2,6 +2,11 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-primary: #003B5C;
+  --color-brand-primary-rgb: 0, 59, 92;
+  --color-brand-secondary: #00ADC6;
+  --color-brand-secondary-dark: #0096AD;
+  --color-brand-secondary-rgb: 0, 173, 198;
 }
 
 @layer base {
@@ -44,7 +49,7 @@
 .custom-marker.active {
   transform: scale(1.4);
   z-index: 1000 !important;
-  filter: drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 5px rgba(0, 173, 198, 0.5));
+  filter: drop-shadow(0 0 1px var(--color-brand-secondary)) drop-shadow(0 0 1px var(--color-brand-secondary)) drop-shadow(0 0 1px var(--color-brand-secondary)) drop-shadow(0 0 5px rgba(0, 173, 198, 0.5));
 }
 
 /* Custom Leaflet Popup Styling */
