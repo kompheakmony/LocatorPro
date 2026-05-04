@@ -42,12 +42,10 @@
 }
 
 .custom-marker.active {
-  transform: scale(1.25);
+  transform: scale(1.4);
+  z-index: 1000 !important;
+  filter: drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 1px #00ADC6) drop-shadow(0 0 5px rgba(0, 173, 198, 0.5));
 }
-
-.marker-branch { background: var(--accent-blue); }
-.marker-247 { background: var(--accent-emerald); }
-.marker-atm { background: var(--accent-amber); }
 
 /* Custom Leaflet Popup Styling */
 .leaflet-popup-content-wrapper {
