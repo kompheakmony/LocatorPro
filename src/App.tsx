@@ -18,6 +18,10 @@ export default function App() {
 
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
+  const isValidLatLng = (lat: any, lng: any) => {
+    return typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng);
+  };
+
   useEffect(() => {
     // Fetch dynamic data
     const params = new URLSearchParams(window.location.search);
@@ -27,7 +31,7 @@ export default function App() {
     LocationService.fetchLocations(MY_MAP_ID)
       .then(data => {
         setLocations(data);
-        if (data.length > 0) {
+        if (data.length > 0 && isValidLatLng(data[0].lat, data[0].lng)) {
           setMapCenter([data[0].lat, data[0].lng]);
         }
         setIsLoading(false);
@@ -41,10 +45,12 @@ export default function App() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
+          if (isValidLatLng(position.coords.latitude, position.coords.longitude)) {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          }
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -57,7 +63,7 @@ export default function App() {
     setSelectedId(id);
     if (id) {
       const loc = locations.find(l => l.id === id);
-      if (loc) {
+      if (loc && isValidLatLng(loc.lat, loc.lng)) {
         // Desktop offset to keep marker below floating header
         const isDesktop = window.innerWidth >= 768;
         const latOffset = isDesktop ? 0.003 : 0; // Adjusted for zoom level 16
@@ -68,7 +74,7 @@ export default function App() {
   }, [locations]);
 
   const centerOnUser = useCallback(() => {
-    if (userLocation) {
+    if (userLocation && isValidLatLng(userLocation.lat, userLocation.lng)) {
       setMapCenter([userLocation.lat, userLocation.lng]);
       setMapZoom(15);
     }

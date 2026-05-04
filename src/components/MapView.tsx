@@ -34,10 +34,12 @@ const getCustomIcon = (category: Category, isActive: boolean) => {
 function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, zoom, {
-      duration: 0.8,
-      easeLinearity: 0.25
-    });
+    if (center && !isNaN(center[0]) && !isNaN(center[1])) {
+      map.flyTo(center, zoom, {
+        duration: 0.8,
+        easeLinearity: 0.25
+      });
+    }
   }, [center, zoom, map]);
   return null;
 }
@@ -111,10 +113,12 @@ export default function MapView({ locations, selectedId, onSelect, center, zoom 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const safeCenter: [number, number] = (center && !isNaN(center[0]) && !isNaN(center[1])) ? center : [11.5564, 104.9282];
+
   return (
     <div className="h-full w-full relative">
       <MapContainer
-        center={center}
+        center={safeCenter}
         zoom={zoom}
         zoomControl={false}
         className="h-full w-full"
@@ -127,7 +131,7 @@ export default function MapView({ locations, selectedId, onSelect, center, zoom 
         />
         <ZoomControl position="bottomleft" />
         
-        {React.useMemo(() => locations.map((loc) => (
+        {React.useMemo(() => locations.filter(loc => typeof loc.lat === 'number' && typeof loc.lng === 'number' && !isNaN(loc.lat) && !isNaN(loc.lng)).map((loc) => (
           <MarkerWithAutoPopup
             key={loc.id}
             loc={loc}
