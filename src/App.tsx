@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Target, Search, X, Navigation, MapPin } from 'lucide-react';
 import { LocationService } from './services/locationService';
 
-import { BRAND_CONFIG } from './constants';
+import { BRAND_CONFIG, getProxyImageUrl } from './constants';
 
 export default function App() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -458,7 +458,7 @@ export default function App() {
                         </div>
                         <div className="w-24 h-24 bg-slate-50 rounded-2xl overflow-hidden shrink-0 relative shadow-inner ring-1 ring-slate-100">
                           <img 
-                            src={loc.photo} 
+                            src={getProxyImageUrl(loc.photo)} 
                             alt={loc.name}
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover"

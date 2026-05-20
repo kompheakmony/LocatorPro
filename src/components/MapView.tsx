@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Navigation, X, Phone } from 'lucide-react';
-import { BRAND_CONFIG } from '../constants';
+import { BRAND_CONFIG, getProxyImageUrl } from '../constants';
 import { Location, Category } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -177,7 +177,7 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
         {/* Header Image Area */}
         <div className="relative h-40 group">
           <img 
-            src={loc.photo} 
+            src={getProxyImageUrl(loc.photo)} 
             alt={loc.name}
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
