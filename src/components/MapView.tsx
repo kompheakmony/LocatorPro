@@ -32,10 +32,14 @@ const getCustomIcon = (category: Category, isActive: boolean) => {
   return icon;
 };
 
+const isValidLatLng = (lat: any, lng: any): boolean => {
+  return typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng);
+};
+
 function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   useEffect(() => {
-    if (center && !isNaN(center[0]) && !isNaN(center[1])) {
+    if (center && isValidLatLng(center[0], center[1])) {
       map.flyTo(center, zoom, {
         duration: 0.8,
         easeLinearity: 0.25
@@ -114,7 +118,7 @@ export default function MapView({ locations, selectedId, onSelect, center, zoom 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const safeCenter: [number, number] = (center && !isNaN(center[0]) && !isNaN(center[1])) ? center : [11.5564, 104.9282];
+  const safeCenter: [number, number] = (center && isValidLatLng(center[0], center[1])) ? center : [11.5564, 104.9282];
 
   return (
     <div className="h-full w-full relative">
@@ -132,7 +136,7 @@ export default function MapView({ locations, selectedId, onSelect, center, zoom 
         />
         <ZoomControl position="bottomleft" />
         
-        {React.useMemo(() => locations.filter(loc => typeof loc.lat === 'number' && typeof loc.lng === 'number' && !isNaN(loc.lat) && !isNaN(loc.lng)).map((loc) => (
+        {React.useMemo(() => locations.filter(loc => isValidLatLng(loc.lat, loc.lng)).map((loc) => (
           <MarkerWithAutoPopup
             key={loc.id}
             loc={loc}
@@ -175,6 +179,7 @@ function PopupWrapper({ onSelect, loc }: { onSelect: (id: string) => void, loc: 
           <img 
             src={loc.photo} 
             alt={loc.name}
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             onError={(e) => {
               const target = e.target as HTMLImageElement;

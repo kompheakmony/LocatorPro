@@ -21,7 +21,7 @@ export default function App() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   const isValidLatLng = (lat: any, lng: any) => {
-    return typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng);
+    return typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng);
   };
 
   useEffect(() => {
@@ -460,6 +460,7 @@ export default function App() {
                           <img 
                             src={loc.photo} 
                             alt={loc.name}
+                            referrerPolicy="no-referrer"
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;

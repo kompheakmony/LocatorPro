@@ -1,6 +1,6 @@
-# LocatorPro- Business Hub 📍
+# Locate360 - Business Hub 📍
 
-LocatorPro is a high-performance, responsive map-based application designed to help users quickly find business locations. Built with a focus on speed, polish, and usability, it features a modern glassmorphism UI and seamless integration with Google My Maps.
+Locate360 is a high-performance, responsive map-based application designed to help users quickly find business locations. Built with a focus on speed, polish, and usability, it features a modern glassmorphism UI and seamless integration with Google My Maps.
 
 ## ✨ Features
 

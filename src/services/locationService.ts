@@ -8,6 +8,7 @@ import { kml } from '@tmcw/togeojson';
  */
 export class LocationService {
   private static defaultPhoto = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400';
+  private static useServerProxy = true;
 
   static async fetchLocations(mid?: string): Promise<Location[]> {
     console.log(`[LocationService] fetchLocations called with MID: ${mid}`);
@@ -17,16 +18,94 @@ export class LocationService {
       return LOCATIONS;
     }
 
+    let kmlText = '';
+    let fetchedSuccessfully = false;
+
+    // Try Route A: Local backend proxy
     try {
+      console.log(`[LocationService] Attempting to fetch KML from local API proxy...`);
       const response = await fetch(`/api/kml?mid=${mid}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to fetch map data: ${response.status} ${errorData.error || ''}`);
+      if (response.ok) {
+        kmlText = await response.text();
+        if (kmlText && kmlText.includes('<kml')) {
+          fetchedSuccessfully = true;
+          LocationService.useServerProxy = true;
+          console.log(`[LocationService] Successfully fetched KML via local proxy.`);
+        }
+      } else {
+        console.warn(`[LocationService] Local proxy responded with status ${response.status}`);
+        if (response.status === 404) {
+          LocationService.useServerProxy = false;
+        }
       }
-      
-      const kmlText = await response.text();
-      console.log(`[LocationService] KML received, length: ${kmlText.length}`);
-      
+    } catch (e: any) {
+      console.warn(`[LocationService] Local proxy failed:`, e.message);
+      LocationService.useServerProxy = false;
+    }
+
+    const googleKmlUrl = `https://www.google.com/maps/d/u/0/kml?mid=${mid}&forcekml=1`;
+
+    // Try Route B: Public CORS Proxy Client-Side (CORSProxy.io) if local proxy fails
+    if (!fetchedSuccessfully) {
+      try {
+        const corsProxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(googleKmlUrl)}`;
+        console.log(`[LocationService] Local proxy unavailable. Trying CORSProxy.io fallback: ${corsProxyUrl}`);
+        const response = await fetch(corsProxyUrl);
+        if (response.ok) {
+          kmlText = await response.text();
+          if (kmlText && kmlText.includes('<kml')) {
+            fetchedSuccessfully = true;
+            console.log(`[LocationService] Successfully fetched KML via CORSProxy.io`);
+          }
+        }
+      } catch (e: any) {
+        console.warn(`[LocationService] CORSProxy.io fallback failed:`, e.message);
+      }
+    }
+
+    // Try Route C: Public CORS Proxy Client-Side (AllOrigins) if CORSProxy.io fails too
+    if (!fetchedSuccessfully) {
+      try {
+        const allOriginsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(googleKmlUrl)}`;
+        console.log(`[LocationService] Trying AllOrigins fallback: ${allOriginsUrl}`);
+        const response = await fetch(allOriginsUrl);
+        if (response.ok) {
+          kmlText = await response.text();
+          if (kmlText && kmlText.includes('<kml')) {
+            fetchedSuccessfully = true;
+            console.log(`[LocationService] Successfully fetched KML via AllOrigins`);
+          }
+        }
+      } catch (e: any) {
+        console.warn(`[LocationService] AllOrigins fallback failed:`, e.message);
+      }
+    }
+
+    // Try Route D: Direct fetch from Google (Chrome extension or specific environment may allow CORS)
+    if (!fetchedSuccessfully) {
+      try {
+        console.log(`[LocationService] Trying direct KML fetch from Google My Maps...`);
+        const response = await fetch(googleKmlUrl);
+        if (response.ok) {
+          kmlText = await response.text();
+          if (kmlText && kmlText.includes('<kml')) {
+            fetchedSuccessfully = true;
+            console.log(`[LocationService] Successfully fetched KML directly from Google`);
+          }
+        }
+      } catch (e: any) {
+        console.warn(`[LocationService] Direct Google fetch failed:`, e.message);
+      }
+    }
+
+    // If all attempts to retrieve map failed or are empty, gracefully fall back to the pre-loaded static LOCATIONS (100% resilient)
+    if (!fetchedSuccessfully || !kmlText) {
+      console.error(`[LocationService] Failed to load dynamic map data from all proxies. Falling back to default static locations.`);
+      const { LOCATIONS } = await import('../data');
+      return LOCATIONS;
+    }
+
+    try {
       const parser = new DOMParser();
       const kmlDom = parser.parseFromString(kmlText, 'text/xml');
       
@@ -82,9 +161,11 @@ export class LocationService {
               if (driveId) photo = `https://lh3.googleusercontent.com/u/0/d/${driveId}`;
             }
 
-            // Handle My Maps hosted images or Google User Content - proxy via server to bypass NotSameSite
+            // Handle My Maps hosted images or Google User Content - proxy via server if server proxy is responsive
             if (photo.includes('mymaps.usercontent.google.com') || photo.includes('googleusercontent.com/hostedimage')) {
-              photo = `/api/image?url=${encodeURIComponent(photo)}`;
+              if (LocationService.useServerProxy) {
+                photo = `/api/image?url=${encodeURIComponent(photo)}`;
+              }
             }
 
             const address = properties.address || properties.description || description || 'No address provided';
@@ -117,7 +198,9 @@ export class LocationService {
           let photo = this.extractPhoto(description) || this.defaultPhoto;
 
           if (photo.includes('mymaps.usercontent.google.com') || photo.includes('googleusercontent.com/hostedimage')) {
-            photo = `/api/image?url=${encodeURIComponent(photo)}`;
+            if (LocationService.useServerProxy) {
+              photo = `/api/image?url=${encodeURIComponent(photo)}`;
+            }
           }
 
           locations.push({
@@ -134,8 +217,9 @@ export class LocationService {
 
       return locations;
     } catch (error) {
-      console.error('[LocationService] Error in fetchLocations:', error);
-      throw error;
+      console.error('[LocationService] Parsing failed, falling back to static locations:', error);
+      const { LOCATIONS } = await import('../data');
+      return LOCATIONS;
     }
   }
 
