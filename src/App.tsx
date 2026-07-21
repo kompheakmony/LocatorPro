@@ -70,7 +70,7 @@ export default function App() {
         const isDesktop = window.innerWidth >= 768;
         const latOffset = isDesktop ? 0.003 : 0; // Adjusted for zoom level 16
         setMapCenter([loc.lat + latOffset, loc.lng]);
-        setMapZoom(14);
+        setMapZoom(11);
       }
     }
   }, [locations]);
@@ -78,7 +78,7 @@ export default function App() {
   const centerOnUser = useCallback(() => {
     if (userLocation && isValidLatLng(userLocation.lat, userLocation.lng)) {
       setMapCenter([userLocation.lat, userLocation.lng]);
-      setMapZoom(15);
+      setMapZoom(12);
     }
   }, [userLocation]);
 
