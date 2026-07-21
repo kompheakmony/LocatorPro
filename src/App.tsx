@@ -14,7 +14,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
   const [mapCenter, setMapCenter] = useState<[number, number]>([11.5564, 104.9282]); // Default to Phnom Penh
-  const [mapZoom, setMapZoom] = useState(8);
+  const [mapZoom, setMapZoom] = useState(13);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +70,7 @@ export default function App() {
         const isDesktop = window.innerWidth >= 768;
         const latOffset = isDesktop ? 0.003 : 0; // Adjusted for zoom level 16
         setMapCenter([loc.lat + latOffset, loc.lng]);
-        setMapZoom(16);
+        setMapZoom(8);
       }
     }
   }, [locations]);
@@ -78,7 +78,7 @@ export default function App() {
   const centerOnUser = useCallback(() => {
     if (userLocation && isValidLatLng(userLocation.lat, userLocation.lng)) {
       setMapCenter([userLocation.lat, userLocation.lng]);
-      setMapZoom(15);
+      setMapZoom(9);
     }
   }, [userLocation]);
 
