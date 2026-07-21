@@ -2,6 +2,10 @@
 
 Locate360 is a high-performance, responsive map-based application designed to help users quickly find business locations. Built with a focus on speed, polish, and usability, it features a modern glassmorphism UI and seamless integration with Google My Maps.
 
+<p align="center">
+    <img width="100%" alt="aba-locator vercel app_" src="https://github.com/user-attachments/assets/08830102-879c-4dfe-bf21-dbe42c940b49" />
+</p>
+
 ## ✨ Features
 
 - **Interactive Map:** Powered by Leaflet/OpenStreetMap with custom high-resolution markers.
